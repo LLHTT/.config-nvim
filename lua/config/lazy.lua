@@ -9,10 +9,23 @@ vim.opt.rtp:prepend(vim.env.LAZY or lazypath)
 require("lazy").setup({
   spec = {
     -- add LazyVim and import its plugins
-    { "LazyVim/LazyVim", import = "lazyvim.plugins" },
+    {
+      "LazyVim/LazyVim",
+      import = "lazyvim.plugins",
+      opts = {
+        -- colorscheme = "habamax",
+        -- colorscheme = "vscode",
+        colorscheme = "NeoSolarized",
+      },
+    },
     -- import any extras modules here
-    -- { import = "lazyvim.plugins.extras.lang.typescript" },
-    -- { import = "lazyvim.plugins.extras.lang.json" },
+    { import = "lazyvim.plugins.extras.linting.eslint" },
+    { import = "lazyvim.plugins.extras.formatting.prettier" },
+    { import = "lazyvim.plugins.extras.lang.typescript" },
+    { import = "lazyvim.plugins.extras.lang.json" },
+    -- { import = "lazyvim.plugins.extras.lang.markdown" },
+    -- { import = "lazyvim.plugins.extras.lang.tailwind" },
+    { import = "lazyvim.plugins.extras.coding.copilot" },
     -- { import = "lazyvim.plugins.extras.ui.mini-animate" },
     -- import/override with your plugins
     { import = "plugins" },
@@ -26,7 +39,7 @@ require("lazy").setup({
     version = false, -- always use the latest git commit
     -- version = "*", -- try installing the latest stable version for plugins that support semver
   },
-  install = { colorscheme = { "tokyonight", "habamax" } },
+  -- install = { colorscheme = { "tokyonight", "habamax" } },
   checker = { enabled = true }, -- automatically check for plugin updates
   performance = {
     rtp = {
@@ -44,3 +57,38 @@ require("lazy").setup({
     },
   },
 })
+
+-- diagnostic's border
+vim.diagnostic.open_float = (function(orig)
+  return function(opts)
+    local lnum = vim.api.nvim_win_get_cursor(0)[1] - 1
+    -- A more robust solution would check the "scope" value in `opts` to
+    -- determine where to get diagnostics from, but if you're only using
+    -- this for your own purposes you can make it as simple as you like
+    local diagnostics = vim.diagnostic.get(opts.bufnr or 0, { lnum = lnum })
+    local max_severity = vim.diagnostic.severity.HINT
+    for _, d in ipairs(diagnostics) do
+      -- Equality is "less than" based on how the severities are encoded
+      if d.severity < max_severity then
+        max_severity = d.severity
+      end
+    end
+    local border_color = ({
+      [vim.diagnostic.severity.HINT] = "NonText",
+      [vim.diagnostic.severity.INFO] = "Question",
+      [vim.diagnostic.severity.WARN] = "WarningMsg",
+      [vim.diagnostic.severity.ERROR] = "ErrorMsg",
+    })[max_severity]
+    opts.border = {
+      { "╔", border_color },
+      { "═", border_color },
+      { "╗", border_color },
+      { "║", border_color },
+      { "╝", border_color },
+      { "═", border_color },
+      { "╚", border_color },
+      { "║", border_color },
+    }
+    orig(opts)
+  end
+end)(vim.diagnostic.open_float)

@@ -23,8 +23,12 @@ return {
   -- change trouble config
   {
     "folke/trouble.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
     -- opts will be merged with the parent spec
-    opts = { use_diagnostic_signs = true },
+    opts = {
+      win_config = { border = "single" }, -- window configuration for floating windows. See |nvim_open_win()|.
+      use_diagnostic_signs = true,
+    },
   },
 
   -- disable trouble
