@@ -1,4 +1,7 @@
 return {
+  -- blamer
+  { "APZelos/blamer.nvim" },
+
   -- lualine
   {
     "nvim-lualine/lualine.nvim",

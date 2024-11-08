@@ -4,6 +4,7 @@
 local opt = vim.opt -- for conciseness
 vim.g.mapleader = " "
 -- vim.g.lazygit_config = false
+vim.g.blamer_enabled = true
 
 vim.scriptencoding = "utf-8"
 vim.opt.encoding = "utf-8"
